@@ -1,20 +1,29 @@
 """Generates data for train/test algorithms"""
 import os
+import sys
 import random
 import pickle
 from zipfile import ZipFile
 from datetime import datetime
 from urllib.request import urlopen
 
+
 import tldextract
 import pandas as pd
+import tensorflow as tf
+from sklearn.model_selection import train_test_split
 
 from dga_generators import banjori, corebot, cryptolocker, \
     dircrypt, kraken, lockyv2, pykspa, qakbot, ramdo, ramnit, simda
 
+REPO_PATH = os.path.dirname(os.path.realpath(__file__)) + '/'
+sys.path.append(REPO_PATH)
+
+print(REPO_PATH)
+
 # Location of Alexa 1M
 ALEXA_1M = 'http://s3.amazonaws.com/alexa-static/top-1m.csv.zip'
-DATA_PATH = 'dga_classifier/data'
+DATA_PATH = REPO_PATH + '/data'
 # Our ourput file containg all the training data
 DATA_FILE = os.path.join(DATA_PATH, 'traindata.pkl')
 
@@ -157,3 +166,20 @@ def get_data(force=False):
     gen_data(force)
 
     return pickle.load(open(DATA_FILE, 'rb'))
+
+
+def prepare_data(padded_domains, encoded_labels):
+    """Returns TF Dataset in tensor form."""
+    X_train, X_test, y_train, y_test = train_test_split(
+        padded_domains,
+        encoded_labels,
+        test_size=0.10
+    )
+
+    train_ds = tf.data.Dataset.from_tensor_slices(
+        (X_train, y_train)).shuffle(10000).batch(128)
+
+    test_ds = tf.data.Dataset.from_tensor_slices(
+        (X_test, y_test)).batch(128)
+
+    return train_ds, test_ds
