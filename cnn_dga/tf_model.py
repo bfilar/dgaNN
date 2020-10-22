@@ -53,7 +53,8 @@ def main():
     model = define_model(max_features, maxlen)
     callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
     history = model.fit(
-        train_ds, epochs=10,
+        train_ds,
+        epochs=1,
         validation_data=test_ds,
         validation_steps=30,
         callbacks=[callback]
