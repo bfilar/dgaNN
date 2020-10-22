@@ -19,7 +19,6 @@ from dga_generators import banjori, corebot, cryptolocker, \
 REPO_PATH = os.path.dirname(os.path.realpath(__file__)) + '/'
 sys.path.append(REPO_PATH)
 
-print(REPO_PATH)
 
 # Location of Alexa 1M
 ALEXA_1M = 'http://s3.amazonaws.com/alexa-static/top-1m.csv.zip'
